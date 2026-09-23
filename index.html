@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>別讓病人爆炸｜急救車位置挑戰</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#E9EEF2; --paper:#FFFFFF; --ink:#1B2530; --muted:#5A6674;
+  --cart:#C8102E; --cart-dark:#8C0A1F; --cart-hi:#E23A51;
+  --steel:#B9C2CC; --steel-dark:#7D8894; --plate:#FFFDF6;
+  --amber:#F2A900; --ok:#179A63; --bad:#C8102E; --focus:#1F6FEB;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#141A21; --paper:#1D252F; --ink:#E6ECF2; --muted:#9BA7B4;
+    --steel:#46515E; --steel-dark:#2E3740; --plate:#F4F1E6;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#141A21; --paper:#1D252F; --ink:#E6ECF2; --muted:#9BA7B4;
+  --steel:#46515E; --steel-dark:#2E3740; --plate:#F4F1E6;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px);height:100%}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);
+  font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;line-height:1.6;
+  -webkit-tap-highlight-color:transparent}
+button{font:inherit;color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.screen{display:none;max-width:1040px;margin:0 auto;padding:16px}
+.screen.active{display:block}
+
+/* ---------- Home ---------- */
+.home{display:grid;grid-template-columns:1.1fr .9fr;gap:32px;align-items:center;min-height:calc(100vh - 32px)}
+.home h1{font-size:clamp(2.6rem,7vw,4.6rem);line-height:1.05;margin:0 0 12px;font-weight:900;letter-spacing:-.02em}
+.home h1 span{display:block;font-size:.42em;font-weight:700;color:var(--muted);letter-spacing:0;margin-top:10px}
+.rules{max-width:34em;color:var(--muted);margin:0 0 24px}
+.rules b{color:var(--ink)}
+.btn{border:0;border-radius:14px;padding:14px 22px;font-weight:700;font-size:1.05rem}
+.btn-main{background:var(--cart);color:#fff;box-shadow:0 4px 0 var(--cart-dark)}
+.btn-main:active{transform:translateY(3px);box-shadow:0 1px 0 var(--cart-dark)}
+.btn-ghost{background:transparent;border:2px solid var(--steel-dark)}
+.actions{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.toggle{display:flex;gap:8px;align-items:center;margin-top:18px;color:var(--muted);font-size:.95rem}
+.toggle input{width:20px;height:20px;accent-color:var(--cart)}
+.best{margin-top:10px;font-size:.95rem;color:var(--muted)}
+.home-art{display:flex;justify-content:center}
+.home-art svg{width:100%;max-width:340px;height:auto}
+
+/* ---------- Cart ---------- */
+.cart{width:100%;max-width:360px;margin:0 auto;user-select:none}
+.zone{display:block;width:100%;border:0;text-align:left;position:relative;transition:transform .12s,filter .12s}
+.zone:hover{filter:brightness(1.06)}
+.zone.top{background:linear-gradient(var(--steel),var(--steel-dark));border-radius:12px 12px 4px 4px;height:64px;padding:8px 12px;display:flex;align-items:center;gap:10px}
+.zone.top::before{content:"";width:58px;height:40px;border-radius:6px;background:#27313B;box-shadow:inset 0 0 0 4px #3C4854,inset 0 0 0 7px #0F161C}
+.cart-body{display:grid;grid-template-columns:48px 1fr;background:var(--cart-dark);padding:8px 8px 10px 0;border-radius:0 0 8px 8px}
+.zone.side{background:transparent;padding:0;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:6px}
+.zone.side .tank{width:26px;flex:1;min-height:120px;border-radius:13px 13px 6px 6px;background:linear-gradient(90deg,#1E8A57,#3CC486 45%,#1E8A57);margin-top:4px}
+.zone.side .plate{writing-mode:vertical-rl;padding:6px 3px}
+.drawers{display:flex;flex-direction:column;gap:6px}
+.zone.drawer{background:linear-gradient(var(--cart-hi),var(--cart));height:56px;border-radius:6px;padding:0 12px;display:flex;align-items:center;justify-content:space-between;box-shadow:inset 0 -3px 0 rgba(0,0,0,.18)}
+.handle{width:64px;height:10px;border-radius:5px;background:linear-gradient(#E9EDF1,#9AA4AE);box-shadow:0 2px 0 rgba(0,0,0,.25)}
+.plate{background:var(--plate);color:#1B2530;border-radius:4px;padding:2px 8px;font-size:.92rem;line-height:1.3;display:inline-flex;flex-direction:column}
+.plate small{font-size:.75rem;color:#5A6674}
+.wheels{display:flex;justify-content:space-between;padding:0 18px}
+.wheels span{width:26px;height:26px;border-radius:50%;background:#27313B;box-shadow:inset 0 0 0 7px #4A5561}
+.zone.good{animation:good .6s;outline:4px solid var(--ok);outline-offset:2px;z-index:2}
+.zone.show{outline:4px dashed var(--ok);outline-offset:2px;z-index:2}
+.zone.wrong{animation:shake .4s}
+.zone.picked{outline:4px solid var(--amber);outline-offset:2px}
+@keyframes good{50%{transform:translateX(10px)}}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+/* ---------- Study ---------- */
+.study{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+.study h2{margin:0 0 4px;font-size:1.6rem}
+.study .lead{color:var(--muted);margin:0 0 16px}
+.panel{background:var(--paper);border-radius:14px;padding:18px 20px;min-height:220px}
+.panel h3{margin:0 0 8px;font-size:1.2rem}
+.panel ul{margin:0;padding-left:1.2em}
+.panel li{padding:3px 0}
+.panel .empty{color:var(--muted)}
+
+/* ---------- Game ---------- */
+.hud{display:flex;gap:18px;align-items:baseline;flex-wrap:wrap;margin-bottom:12px}
+.hud .stat{font-size:.85rem;color:var(--muted)}
+.hud .stat b{font-size:1.4rem;color:var(--ink);margin-left:4px;font-variant-numeric:tabular-nums}
+.hud .quit{margin-left:auto;background:none;border:0;color:var(--muted);text-decoration:underline;padding:6px}
+.stage{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+.order{background:var(--paper);border-radius:16px;padding:14px 18px;position:relative;margin-bottom:14px;min-height:88px}
+.order::after{content:"";position:absolute;left:36px;bottom:-12px;border:12px solid transparent;border-top-color:var(--paper);border-bottom:0}
+.order .who{font-size:.8rem;color:var(--muted)}
+.order p{margin:2px 0 0;font-size:clamp(1.25rem,3.4vw,1.6rem);font-weight:900;line-height:1.3}
+.order.pop{animation:pop .25s}
+@keyframes pop{from{transform:scale(.96);opacity:.4}}
+.patient-wrap{position:relative;display:flex;justify-content:center}
+.patient-wrap svg{width:100%;max-width:340px;height:auto;overflow:visible}
+#head{transform-box:view-box;transform-origin:120px 104px;transition:transform .25s}
+.panic-eyes,.sweat{opacity:0;transition:opacity .2s}
+.panic .panic-eyes,.sweaty .sweat{opacity:1}
+.panic .calm-eyes{opacity:0}
+.meter{margin-top:6px}
+.meter-label{display:flex;justify-content:space-between;font-size:.85rem;color:var(--muted)}
+.meter-track{height:16px;border-radius:8px;background:var(--steel);overflow:hidden}
+.meter-fill{height:100%;width:20%;background:var(--amber);border-radius:8px}
+.meter.danger .meter-fill{background:var(--bad);animation:blink .5s infinite alternate}
+@keyframes blink{to{opacity:.55}}
+.cart-area{position:relative}
+.quiz{position:absolute;inset:-6px;background:var(--paper);border-radius:14px;padding:18px;display:none;flex-direction:column;gap:12px;z-index:5;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.quiz.on{display:flex}
+.quiz h3{margin:0;font-size:1.15rem}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips span{background:var(--bg);border-radius:6px;padding:3px 8px;font-size:.88rem}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:auto}
+.opts button{border:2px solid var(--steel-dark);background:transparent;border-radius:10px;padding:12px 8px;font-weight:700;line-height:1.3}
+.opts button.ok{border-color:var(--ok);background:var(--ok);color:#fff}
+.opts button.no{border-color:var(--bad);color:var(--bad)}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translate(-50%,40px);opacity:0;
+  background:var(--ink);color:var(--bg);padding:10px 18px;border-radius:12px;font-weight:700;transition:.2s;z-index:50;max-width:90vw;text-align:center}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.toast.good{background:var(--ok);color:#fff}
+.toast.bad{background:var(--bad);color:#fff}
+
+/* ---------- Boom ---------- */
+.boom{position:fixed;inset:0;display:none;align-items:center;justify-content:center;z-index:100;pointer-events:none}
+.boom.on{display:flex}
+.boom .flash{position:absolute;inset:0;background:#fff;animation:flash .5s forwards}
+.boom svg{width:min(90vw,560px);animation:burst .7s cubic-bezier(.2,1.6,.4,1) forwards}
+.boom .bit{position:absolute;left:50%;top:50%;width:14px;height:14px;border-radius:3px;animation:fly 1s ease-out forwards}
+@keyframes flash{to{opacity:0}}
+@keyframes burst{from{transform:scale(.1) rotate(-20deg)}to{transform:scale(1) rotate(0)}}
+@keyframes fly{to{transform:translate(var(--x),var(--y)) rotate(540deg);opacity:0}}
+body.shake .screen.active{animation:shake .12s 5}
+
+/* ---------- Result ---------- */
+.result{display:grid;grid-template-columns:.8fr 1.2fr;gap:28px;align-items:start;padding-top:20px}
+.result h2{font-size:clamp(2rem,6vw,3rem);margin:0;line-height:1.1;font-weight:900}
+.result .sub{color:var(--muted);margin:6px 0 18px}
+.scores{display:flex;gap:28px;margin-bottom:22px}
+.scores div{font-size:.85rem;color:var(--muted)}
+.scores b{display:block;font-size:2rem;color:var(--ink);font-variant-numeric:tabular-nums}
+.review{background:var(--paper);border-radius:14px;padding:16px 20px;margin-bottom:20px}
+.review h3{margin:0 0 8px;font-size:1.05rem}
+.review ol{margin:0;padding-left:1.3em}
+.review li{padding:4px 0}
+.review li span{color:var(--ok);font-weight:700}
+.result-art svg{width:100%;max-width:300px;height:auto}
+
+@media (max-width:760px){
+  .home,.study,.stage,.result{grid-template-columns:1fr;gap:16px}
+  .home{min-height:auto;padding-top:24px}
+  .home-art{order:-1}
+  .home-art svg{max-width:220px}
+  .patient-wrap svg{max-width:200px}
+  .order{min-height:0}
+  .result-art{text-align:center}
+  .result-art svg{max-width:180px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms!important;animation-iteration-count:1!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<section id="home" class="screen active">
+  <div class="home">
+    <div>
+      <h1>別讓病人爆炸<span>急救車位置記憶挑戰</span></h1>
+      <p class="rules">醫師會喊出要的物品，你要<b>點出它放在急救車的哪一層</b>。答對病人就消一點氣；答錯或動作太慢，病人會越脹越大。膨脹指數滿了——砰。</p>
+      <div class="actions">
+        <button class="btn btn-main" id="btnStart">開始挑戰</button>
+        <button class="btn btn-ghost" id="btnStudy">先看急救車</button>
+      </div>
+      <label class="toggle"><input type="checkbox" id="easy"> 抽屜上顯示分類（新手模式）</label>
+      <div class="best" id="bestHome"></div>
+    </div>
+    <div class="home-art" id="homeArt"></div>
+  </div>
+</section>
+
+<!-- STUDY -->
+<section id="study" class="screen">
+  <div class="study">
+    <div>
+      <h2>認識急救車</h2>
+      <p class="lead">點每一層，看看裡面放了什麼。記熟了再開始挑戰。</p>
+      <div id="studyCart"></div>
+    </div>
+    <div>
+      <div class="panel" id="studyPanel"><p class="empty">點左邊急救車的任一位置查看內容。</p></div>
+      <div class="actions" style="margin-top:16px">
+        <button class="btn btn-main" id="btnStudyStart">我記住了，開始挑戰</button>
+        <button class="btn btn-ghost" id="btnStudyHome">回首頁</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GAME -->
+<section id="game" class="screen">
+  <div class="hud">
+    <div class="stat">分數<b id="hScore">0</b></div>
+    <div class="stat">連對<b id="hCombo">0</b></div>
+    <div class="stat">關卡<b id="hLevel">1</b></div>
+    <button class="quit" id="btnQuit">結束</button>
+  </div>
+  <div class="stage">
+    <div>
+      <div class="order" id="order"><div class="who">醫師</div><p id="orderText"></p></div>
+      <div class="patient-wrap" id="patientWrap"></div>
+      <div class="meter" id="meter">
+        <div class="meter-label"><span>病人膨脹指數</span><span id="meterNum">20%</span></div>
+        <div class="meter-track"><div class="meter-fill" id="meterFill"></div></div>
+      </div>
+    </div>
+    <div class="cart-area">
+      <div id="gameCart"></div>
+      <div class="quiz" id="quiz">
+        <h3 id="quizTitle"></h3>
+        <div class="chips" id="quizChips"></div>
+        <div class="opts" id="quizOpts"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- RESULT -->
+<section id="result" class="screen">
+  <div class="result">
+    <div class="result-art" id="resultArt"></div>
+    <div>
+      <h2>砰！病人爆炸了</h2>
+      <p class="sub" id="resultSub"></p>
+      <div class="scores">
+        <div>分數<b id="rScore">0</b></div>
+        <div>答對<b id="rCorrect">0</b></div>
+        <div>最長連對<b id="rCombo">0</b></div>
+      </div>
+      <div class="review" id="review"></div>
+      <div class="actions">
+        <button class="btn btn-main" id="btnAgain">再挑戰一次</button>
+        <button class="btn btn-ghost" id="btnReview">複習急救車</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="boom" id="boom"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ===== 急救車內容（常見配置，可依單位實際清單調整） ===== */
+const CART = [
+  {id:'top',type:'top',name:'車頂',hint:'電擊與監測',items:['電擊器（除顫器）','電擊貼片','心電圖電極片','甦醒球（Ambu bag）','急救記錄單']},
+  {id:'side',type:'side',name:'側邊',hint:'掛放設備',items:['CPR 背板','氧氣筒','銳器收集盒']},
+  {id:'d1',type:'drawer',name:'第一層',hint:'急救藥物',items:['Epinephrine（Bosmin）1mg','Atropine 0.5mg','Amiodarone（Cordarone）150mg','Sodium bicarbonate 7%','Calcium gluconate 10%','50% Glucose','Lidocaine 2%','Adenosine 6mg','Naloxone 0.4mg']},
+  {id:'d2',type:'drawer',name:'第二層',hint:'靜脈注射用物',items:['IV 留置針 18G','IV 留置針 20G','IV 留置針 22G','3mL 空針','10mL 空針','20mL 空針','三路活塞','延長管','止血帶','酒精棉片','透氣膠帶']},
+  {id:'d3',type:'drawer',name:'第三層',hint:'輸液',items:['N/S 500mL',"Lactated Ringer's 500mL",'D5W 500mL','輸液套','加壓輸液袋']},
+  {id:'d4',type:'drawer',name:'第四層',hint:'呼吸道',items:['喉頭鏡柄','喉頭鏡葉片（彎型）','氣管內管 7.0','氣管內管 7.5','通條（Stylet）','口咽呼吸道','牙墊','氣管內管固定器','水溶性潤滑劑','ETCO₂ 偵測器']},
+  {id:'d5',type:'drawer',name:'第五層',hint:'抽吸與給氧',items:['抽痰管','Yankauer 吸引頭','氧氣面罩','非再吸入型面罩','鼻胃管','無菌手套','手電筒']}
+];
+const PREFIX = ['快！給我','馬上拿','請準備','遞給我','現在要'];
+
+const $ = s => document.querySelector(s);
+const rand = a => a[Math.floor(Math.random()*a.length)];
+const shuffle = a => { a=[...a]; for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; };
+const store = {
+  get(k,d){ try{ const v=localStorage.getItem(k); return v===null?d:v; }catch(e){ return d; } },
+  set(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+};
+
+let easy = store.get('cc_easy','0')==='1';
+let best = +store.get('cc_best','0') || 0;
+$('#easy').checked = easy;
+$('#easy').addEventListener('change', e => { easy = e.target.checked; store.set('cc_easy', easy?'1':'0'); });
+
+function show(id){
+  document.querySelectorAll('.screen').forEach(s => s.classList.toggle('active', s.id===id));
+  window.scrollTo(0,0);
+}
+function updateBest(){ $('#bestHome').textContent = best ? `你的最高分：${best}` : ''; }
+updateBest();
+
+/* ===== Patient SVG ===== */
+function patientSVG(soot){
+  const skin = soot ? '#4A4D52' : '#F2C9A0';
+  const face = soot
+    ? `<path d="M96 88l14 14M110 88l-14 14M130 88l14 14M144 88l-14 14" stroke="#111" stroke-width="5" stroke-linecap="round"/>
+       <ellipse cx="120" cy="124" rx="12" ry="9" fill="#111"/>
+       <path d="M78 64l-8-22 18 12 4-24 12 20 8-26 10 24 12-22 4 24 16-14-6 22" fill="none" stroke="#2A2C30" stroke-width="5" stroke-linejoin="round"/>
+       <circle cx="70" cy="30" r="12" fill="#9AA0A6" opacity=".7"/><circle cx="170" cy="22" r="16" fill="#9AA0A6" opacity=".6"/><circle cx="120" cy="10" r="10" fill="#9AA0A6" opacity=".5"/>`
+    : `<g class="calm-eyes"><ellipse cx="103" cy="96" rx="5" ry="7" fill="#1B2530"/><ellipse cx="137" cy="96" rx="5" ry="7" fill="#1B2530"/>
+         <path d="M108 124q12 9 24 0" fill="none" stroke="#1B2530" stroke-width="4" stroke-linecap="round"/></g>
+       <g class="panic-eyes"><circle cx="103" cy="95" r="11" fill="#fff" stroke="#1B2530" stroke-width="3"/><circle cx="137" cy="95" r="11" fill="#fff" stroke="#1B2530" stroke-width="3"/>
+         <circle cx="103" cy="95" r="3.5" fill="#1B2530"/><circle cx="137" cy="95" r="3.5" fill="#1B2530"/>
+         <path d="M104 128q4-6 8 0t8 0 8 0 8 0" fill="none" stroke="#1B2530" stroke-width="4" stroke-linecap="round"/></g>
+       <circle cx="92" cy="114" r="7" fill="#E88A8A" opacity=".5"/><circle cx="148" cy="114" r="7" fill="#E88A8A" opacity=".5"/>
+       <path d="M96 62q8-14 24-12q16-2 24 12" fill="none" stroke="#5A3A26" stroke-width="6" stroke-linecap="round"/>
+       <g class="sweat"><path d="M168 76q6 10 0 14q-6-4 0-14z" fill="#6EC6FF"/><path d="M72 84q5 9 0 12q-5-3 0-12z" fill="#6EC6FF"/></g>`;
+  return `<svg viewBox="0 0 240 200" role="img" aria-label="${soot?'爆炸後的病人':'病人'}">
+    <rect x="18" y="150" width="204" height="44" rx="10" fill="#8FB8D8"/>
+    <rect x="18" y="150" width="204" height="12" rx="6" fill="#B5D3EA"/>
+    <ellipse cx="120" cy="150" rx="86" ry="18" fill="#FFFFFF" stroke="#C9D3DC" stroke-width="3"/>
+    <g id="${soot?'sootHead':'head'}">
+      <circle cx="120" cy="104" r="52" fill="${skin}" id="${soot?'':'skin'}" stroke="rgba(0,0,0,.15)" stroke-width="3"/>
+      ${face}
+    </g>
+  </svg>`;
+}
+function cartArtSVG(){
+  return `<svg viewBox="0 0 300 300" aria-hidden="true">
+    <g>${patientSVG(false).replace(/<\/?svg[^>]*>/g,'').replace(/ id="[^"]*"/g,'')}</g>
+    <g transform="translate(190 120)">
+      <rect x="0" y="0" width="90" height="16" rx="4" fill="#9AA4AE"/>
+      ${[0,1,2,3,4].map(i=>`<rect x="4" y="${20+i*26}" width="82" height="22" rx="3" fill="#C8102E"/><rect x="30" y="${29+i*26}" width="30" height="5" rx="2" fill="#E9EDF1"/>`).join('')}
+      <circle cx="16" cy="158" r="8" fill="#27313B"/><circle cx="74" cy="158" r="8" fill="#27313B"/>
+    </g>
+  </svg>`;
+}
+$('#homeArt').innerHTML = cartArtSVG();
+
+/* ===== Cart builder ===== */
+function buildCart(el, onPick, showHint){
+  el.innerHTML = '';
+  const cart = document.createElement('div'); cart.className = 'cart';
+  const plate = p => `<span class="plate"><b>${p.name}</b>${showHint?`<small>${p.hint}</small>`:''}</span>`;
+  const mk = (p, cls, inner) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'zone '+cls; b.dataset.id = p.id;
+    b.setAttribute('aria-label', p.name + (showHint?'，'+p.hint:''));
+    b.innerHTML = inner;
+    b.addEventListener('click', () => onPick(p, b));
+    return b;
+  };
+  const top = CART.find(p=>p.type==='top'), side = CART.find(p=>p.type==='side');
+  if(top) cart.append(mk(top,'top',plate(top)));
+  const body = document.createElement('div'); body.className = 'cart-body';
+  if(side) body.append(mk(side,'side',`<span class="tank"></span>${plate(side)}`));
+  const dr = document.createElement('div'); dr.className = 'drawers';
+  CART.filter(p=>p.type==='drawer').forEach(p => dr.append(mk(p,'drawer',plate(p)+'<span class="handle"></span>')));
+  body.append(dr); cart.append(body);
+  const w = document.createElement('div'); w.className = 'wheels'; w.innerHTML = '<span></span><span></span>';
+  cart.append(w);
+  el.append(cart);
+}
+
+/* ===== Study ===== */
+function openStudy(){
+  buildCart($('#studyCart'), (p, b) => {
+    document.querySelectorAll('#studyCart .zone').forEach(z=>z.classList.remove('picked'));
+    b.classList.add('picked');
+    $('#studyPanel').innerHTML = `<h3>${p.name}・${p.hint}</h3><ul>${p.items.map(i=>`<li>${i}</li>`).join('')}</ul>`;
+  }, true);
+  $('#studyPanel').innerHTML = '<p class="empty">點左邊急救車的任一位置查看內容。</p>';
+  show('study');
+}
+
+/* ===== Game ===== */
+let G = null, raf = 0, lastT = 0;
+
+function toast(msg, kind, ms=1100){
+  const t = $('#toast'); t.textContent = msg; t.className = 'toast on '+(kind||'');
+  clearTimeout(toast._t); toast._t = setTimeout(()=>t.className='toast', ms);
+}
+
+function startGame(){
+  G = {pressure:20, score:0, combo:0, maxCombo:0, correct:0, level:1, lock:true, q:null, mistakes:[], lastItem:null, running:true};
+  $('#patientWrap').innerHTML = patientSVG(false);
+  buildCart($('#gameCart'), onPickZone, easy);
+  $('#quiz').classList.remove('on');
+  show('game');
+  hud(); render();
+  newQ();
+  lastT = performance.now();
+  cancelAnimationFrame(raf); raf = requestAnimationFrame(loop);
+}
+
+function rate(){ return 3.6 + G.level*1.3; }
+
+function loop(t){
+  if(!G || !G.running) return;
+  const dt = Math.min(.1,(t-lastT)/1000); lastT = t;
+  if(!G.lock) G.pressure += rate()*dt;
+  render();
+  if(G.pressure >= 100){ explode(); return; }
+  raf = requestAnimationFrame(loop);
+}
+
+function render(){
+  const p = Math.max(0, Math.min(100, G.pressure));
+  $('#meterFill').style.width = p+'%';
+  $('#meterNum').textContent = Math.round(p)+'%';
+  $('#meter').classList.toggle('danger', p>=75);
+  const head = $('#head'); if(!head) return;
+  head.style.transform = `scale(${1 + p/100*0.5})`;
+  const hue = (28 - p*0.4 + 360) % 360, sat = 60 + p*0.15, light = 78 - p*0.2;
+  $('#skin').setAttribute('fill', `hsl(${hue} ${sat}% ${light}%)`);
+  const w = $('#patientWrap');
+  w.classList.toggle('sweaty', p>=45);
+  w.classList.toggle('panic', p>=70);
+}
+
+function hud(){
+  $('#hScore').textContent = G.score;
+  $('#hCombo').textContent = G.combo;
+  $('#hLevel').textContent = G.level;
+}
+
+function makeQ(){
+  const filled = CART.filter(p=>p.items.length);
+  const all = filled.flatMap(p=>p.items.map(i=>({item:i,pos:p})));
+  const multi = filled.filter(p=>p.items.length>=2);
+  if(Math.random() < 0.28 && multi.length){
+    const pos = rand(multi);
+    const missing = rand(pos.items);
+    const others = shuffle(all.filter(x=>x.pos.id!==pos.id && !pos.items.includes(x.item)).map(x=>x.item));
+    if(others.length>=3) return {type:'missing', pos, missing, shown:pos.items.filter(i=>i!==missing), opts:shuffle([missing,...others.slice(0,3)])};
+  }
+  let pick; do { pick = rand(all); } while(all.length>1 && pick.item===G.lastItem);
+  G.lastItem = pick.item;
+  const answer = filled.filter(p=>p.items.includes(pick.item)).map(p=>p.id);
+  return {type:'where', item:pick.item, answer};
+}
+
+function newQ(){
+  if(!G.running) return;
+  document.querySelectorAll('#gameCart .zone').forEach(z=>z.classList.remove('good','show','wrong'));
+  G.q = makeQ();
+  const o = $('#order'); o.classList.remove('pop'); void o.offsetWidth; o.classList.add('pop');
+  if(G.q.type==='where'){
+    $('#quiz').classList.remove('on');
+    $('#orderText').textContent = `${rand(PREFIX)} ${G.q.item}！`;
+  } else {
+    const q = G.q;
+    $('#orderText').textContent = `護理師，${q.pos.name}少了一樣東西！`;
+    $('#quizTitle').textContent = `打開${q.pos.name}，缺了哪一樣？`;
+    $('#quizChips').innerHTML = q.shown.map(i=>`<span>${i}</span>`).join('');
+    $('#quizOpts').innerHTML = '';
+    q.opts.forEach(opt => {
+      const b = document.createElement('button'); b.type='button'; b.textContent = opt;
+      b.addEventListener('click', () => onPickOpt(opt, b));
+      $('#quizOpts').append(b);
+    });
+    $('#quiz').classList.add('on');
+  }
+  G.lock = false;
+}
+
+function onPickZone(p, b){
+  if(!G || G.lock || G.q.type!=='where') return;
+  G.lock = true;
+  if(G.q.answer.includes(p.id)){
+    b.classList.add('good');
+    right();
+  } else {
+    b.classList.add('wrong');
+    G.q.answer.forEach(id => document.querySelector(`#gameCart .zone[data-id="${id}"]`)?.classList.add('show'));
+    const names = CART.filter(x=>G.q.answer.includes(x.id)).map(x=>`${x.name}（${x.hint}）`).join('、');
+    wrong(`${G.q.item} 在${names}`, {q:G.q.item, a:names});
+  }
+}
+
+function onPickOpt(opt, b){
+  if(!G || G.lock) return;
+  G.lock = true;
+  const q = G.q;
+  [...$('#quizOpts').children].forEach(x => { if(x.textContent===q.missing) x.classList.add('ok'); });
+  if(opt===q.missing){ right(); }
+  else {
+    b.classList.add('no');
+    wrong(`${q.pos.name}少的是：${q.missing}`, {q:`${q.pos.name}（${q.pos.hint}）裡有什麼`, a:q.missing});
+  }
+}
+
+function right(){
+  G.pressure = Math.max(0, G.pressure - 22);
+  G.score += 10 + G.combo*2;
+  G.combo++; G.maxCombo = Math.max(G.maxCombo, G.combo);
+  G.correct++;
+  const lv = 1 + Math.floor(G.correct/5);
+  if(lv > G.level){ G.level = lv; toast(`第 ${lv} 關：病人脹得更快了`, 'bad', 1300); }
+  else toast(rand(['正確！','就是它','漂亮','病人消氣了']), 'good', 600);
+  hud(); render();
+  setTimeout(newQ, 520);
+}
+
+function wrong(msg, rec){
+  G.pressure += 18; G.combo = 0;
+  if(!G.mistakes.some(m=>m.q===rec.q)) G.mistakes.push(rec);
+  hud(); render();
+  if(G.pressure >= 100){ explode(); return; }
+  toast(msg, 'bad', 1600);
+  setTimeout(newQ, 1700);
+}
+
+function explode(){
+  G.running = false; G.lock = true;
+  cancelAnimationFrame(raf);
+  if(G.score > best){ best = G.score; store.set('cc_best', String(best)); }
+  const boom = $('#boom');
+  const colors = ['#F2A900','#C8102E','#FF7A1A','#FFD84D','#F2C9A0'];
+  let bits = '';
+  for(let i=0;i<28;i++){
+    const a = Math.random()*Math.PI*2, d = 180 + Math.random()*320;
+    bits += `<span class="bit" style="background:${rand(colors)};--x:${Math.cos(a)*d}px;--y:${Math.sin(a)*d}px"></span>`;
+  }
+  boom.innerHTML = `<div class="flash"></div>${bits}
+    <svg viewBox="0 0 400 300" aria-label="爆炸">
+      <polygon points="200,10 232,90 320,40 282,122 392,130 296,172 360,262 250,208 214,292 186,208 70,272 124,176 10,150 118,120 60,40 164,92" fill="#FFD84D" stroke="#C8102E" stroke-width="10" stroke-linejoin="round"/>
+      <text x="200" y="176" text-anchor="middle" font-family="Noto Sans TC, sans-serif" font-weight="900" font-size="78" fill="#C8102E" stroke="#fff" stroke-width="4" paint-order="stroke">砰！</text>
+    </svg>`;
+  boom.classList.add('on');
+  document.body.classList.add('shake');
+  setTimeout(()=>{
+    boom.classList.remove('on'); document.body.classList.remove('shake');
+    showResult();
+  }, 1400);
+}
+
+function showResult(){
+  $('#resultArt').innerHTML = patientSVG(true);
+  $('#rScore').textContent = G.score;
+  $('#rCorrect').textContent = G.correct;
+  $('#rCombo').textContent = G.maxCombo;
+  const lines = [
+    [0,'急救車還很陌生，先去複習一輪吧。'],
+    [60,'有點樣子了，再熟一點病人就撐得住。'],
+    [150,'反應很快！已經是可靠的急救夥伴。'],
+    [300,'急救車在你腦中有地圖，學長姐等級。']
+  ];
+  $('#resultSub').textContent = lines.filter(l=>G.score>=l[0]).pop()[1] + (G.score>=best && G.score>0 ? '　新的最高分！' : `　最高分 ${best}`);
+  $('#review').innerHTML = G.mistakes.length
+    ? `<h3>這次答錯的，記起來</h3><ol>${G.mistakes.map(m=>`<li>${m.q} → <span>${m.a}</span></li>`).join('')}</ol>`
+    : `<h3>這次沒有答錯</h3><p style="margin:0">病人是被時間撐爆的——下次再快一點。</p>`;
+  updateBest();
+  show('result');
+}
+
+$('#btnStart').addEventListener('click', startGame);
+$('#btnStudy').addEventListener('click', openStudy);
+$('#btnStudyStart').addEventListener('click', startGame);
+$('#btnStudyHome').addEventListener('click', ()=>show('home'));
+$('#btnAgain').addEventListener('click', startGame);
+$('#btnReview').addEventListener('click', openStudy);
+$('#btnQuit').addEventListener('click', ()=>{ if(G){ G.running=false; cancelAnimationFrame(raf);} updateBest(); show('home'); });
+</script>
+</body>
+</html>
